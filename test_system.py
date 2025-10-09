@@ -26,33 +26,33 @@ from research_agents import AgentOrchestrator
 # Helpers & safe fallbacks
 # ---------------------------
 
-def _cfg_attr(cfg: Any, primary: str, fallback: str, default=None):
+def _cfg_attr(cfg: Any, primary: str, fallback: str, default=None): # Safely retrieve configuration attributes
     return getattr(cfg, primary, getattr(cfg, fallback, default))
 
-def _dp_has(dp: Any, method: str) -> bool:
+def _dp_has(dp: Any, method: str) -> bool: # Check if DocumentProcessor has a method
     return hasattr(dp, method) and callable(getattr(dp, method))
 
-def _ensure_dir(p: Path) -> Path:
+def _ensure_dir(p: Path) -> Path: # Ensure directory exists
     p.mkdir(parents=True, exist_ok=True)
     return p
 
-def _resolve_sample_dir(cfg: Config) -> Path:
+def _resolve_sample_dir(cfg: Config) -> Path: # Resolve the directory for sample papers
     sample_dir = getattr(cfg, "SAMPLE_PAPERS_DIR", None)
     if sample_dir:
         return Path(sample_dir)
     data_dir = getattr(cfg, "data_dir", Path("data"))
     return Path(data_dir) / "sample_papers"
 
-def _list_pdfs(sample_dir: Path) -> List[Path]:
+def _list_pdfs(sample_dir: Path) -> List[Path]: # List all PDF files in the sample directory
     if not sample_dir.exists():
         return []
     return sorted(p for p in sample_dir.glob("*.pdf") if p.is_file())
 
-def _tokens(s: str) -> List[str]:
+def _tokens(s: str) -> List[str]: # Simple whitespace tokenizer with lowercasing
     return [w.lower() for w in s.replace("\n", " ").split() if w.strip()]
 
 
-class ResearchGPTTester:
+class ResearchGPTTester: # Main testing and evaluation class
     def __init__(self):
         """
         Initialize testing system
@@ -80,7 +80,8 @@ class ResearchGPTTester:
             "overall_scores": {},
         }
 
-        # Paths
+        # Paths Initializes path variables. It uses the new helper functions (_cfg_attr, _ensure_dir, _resolve_sample_dir, _list_pdfs) to set up the results directory, 
+        # a dedicated tests directory, and locate sample PDF files for I/O testing.
         results_root = _cfg_attr(self.config, "RESULTS_DIR", "results_dir", default="results")
         self.results_dir = _ensure_dir(Path(results_root))
         self.tests_dir = _ensure_dir(self.results_dir / "tests")
@@ -106,7 +107,7 @@ class ResearchGPTTester:
         """
         print("\n=== Testing Document Processing ===")
 
-        test_results = {
+        test_results = { # Initialize test results Initialized test_results dictionary is more descriptive with counters for docs, meta, and ingested.
             "pdf_extraction": False,
             "text_preprocessing": False,
             "chunking": False,
@@ -119,7 +120,8 @@ class ResearchGPTTester:
         }
 
         try:
-            # 1) Preprocessing (feature-detected)
+            # 1) Preprocessing (feature-detected) Preprocessing being feature-detected (_dp_has) for robustness. The actual test code has been made more explicit 
+            # to check if the result is a non-empty string.
             sample_text = (
                 "This is a sample research paper about artificial intelligence "
                 "and machine learning algorithms."
@@ -133,7 +135,7 @@ class ResearchGPTTester:
                 # If no method exposed, consider preprocessing N/A but not a failure
                 print("   • Text preprocessing: SKIP (method not available)")
 
-            # 2) Chunking (feature-detected)
+            # 2) Chunking (feature-detected)  Chunking test is now feature-detected (_dp_has), and it explicitly checks if the result chunks is truthy (non-empty list/iterable).
             if _dp_has(self.doc_processor, "chunk_text"):
                 chunks = self.doc_processor.chunk_text(sample_text, chunk_size=50, overlap=10)
                 if chunks:
@@ -142,7 +144,8 @@ class ResearchGPTTester:
             else:
                 print("   • Text chunking: SKIP (method not available)")
 
-            # 3) PDF ingestion (if present)
+            # 3) PDF ingestion (if present) PDF ingestion and extraction is fully implemented. It iterates over the first two available PDFs (self.pdfs[:2]) and attempts to ingest 
+            # them using either add_pdf (preferred) or process_document, updating the ingested count.
             if self.pdfs:
                 # Prefer add_pdf; fallback to process_document
                 for p in self.pdfs[:2]:
@@ -160,7 +163,7 @@ class ResearchGPTTester:
             else:
                 print(f"   • No PDFs in {self.sample_dir}; skipping PDF extraction")
 
-            # 4) Index building
+            # 4) Index building The index building logic is now feature-detected (_dp_has) and attempts to run build_search_index().
             if _dp_has(self.doc_processor, "build_search_index"):
                 self.doc_processor.build_search_index()
                 test_results["index_building"] = True
@@ -168,7 +171,9 @@ class ResearchGPTTester:
             else:
                 print("   • Index building: SKIP (method not available)")
 
-            # 5) Stats & similarity search
+            # 5) Stats & similarity search Statistics on documents/metadata are gathered from the doc_processor. Similarity search 
+            # is feature-detected and tested by calling find_similar_chunks with a query, checking that a list of results is returned. 
+            # Context building logic is added to handle common return formats.
             docs = getattr(self.doc_processor, "docs", [])
             meta = getattr(self.doc_processor, "doc_meta", [])
             test_results["docs"] = len(docs)
@@ -188,7 +193,7 @@ class ResearchGPTTester:
             test_results["errors"].append(f"Document processing error: {str(e)}")
             print(f"   ✗ Document processing error: {str(e)}")
 
-        # Save partial results
+        # Save partial results Added saving of partial results to a JSON file (doc_processing.json) in the new test artifacts directory.
         (self.tests_dir / "doc_processing.json").write_text(
             json.dumps(test_results, indent=2, ensure_ascii=False), encoding="utf-8"
         )
@@ -210,14 +215,15 @@ class ResearchGPTTester:
         """
         print("\n=== Testing Prompting Strategies ===")
 
-        strategy_results: Dict[str, List[Dict[str, Any]]] = {
+        strategy_results: Dict[str, List[Dict[str, Any]]] = { # Initialize strategy results Explicitly initialized strategy_results with types.
             "chain_of_thought": [],
             "self_consistency": [],
             "react_workflow": [],
             "basic_qa": [],
         }
 
-        def build_ctx(q: str) -> List[str]:
+        def build_ctx(q: str) -> List[str]: # Build context for a given query  Defined a helper function build_ctx(q: str) within the test method. 
+            #This function is responsible for calling find_similar_chunks on the doc_processor to retrieve context for the prompt, making the tests more realistic (RAG-like).
             if _dp_has(self.doc_processor, "find_similar_chunks"):
                 top = self.doc_processor.find_similar_chunks(q, top_k=4)
                 # Many implementations return (score, text, meta)
@@ -233,8 +239,9 @@ class ResearchGPTTester:
         for i, query in enumerate(self.test_queries[:3]):
             print(f"   Testing query {i+1}: {query[:60]}...")
             try:
-                # Basic QA (fallback to answer_research_question if present)
-                if hasattr(self.research_assistant, "answer_research_question"):
+                # Basic QA (fallback to answer_research_question if present) Added Basic QA as the first strategy to test (using answer_research_question 
+                # with flags turned off). This was not in the original barebones list of strategies but is a necessary baseline. Added a check for the method's existence.
+                if hasattr(self.research_assistant, "answer_research_question"): # Basic QA
                     t0 = time.time()
                     basic = self.research_assistant.answer_research_question(
                         query, use_cot=False, use_verification=False
@@ -245,7 +252,8 @@ class ResearchGPTTester:
                         {"query": query, "response_length": len(ans), "response_time": t_basic}
                     )
 
-                # Chain-of-Thought
+                # Chain-of-Thought Chain-of-Thought test logic is implemented. It now builds context (ctx) for the call and adds a new metric: ctx_size. 
+                # Added a check for the method's existence.
                 if hasattr(self.research_assistant, "chain_of_thought_reasoning"):
                     ctx = build_ctx(query)
                     t0 = time.time()
@@ -255,7 +263,8 @@ class ResearchGPTTester:
                         {"query": query, "response_length": len(cot), "response_time": t_cot, "ctx_size": len(ctx)}
                     )
 
-                # Self-Consistency
+                # Self-Consistency Self-Consistency test logic is implemented. It also builds context (ctx) and now correctly handles dictionaries or strings
+                # as results for length calculation. Added a check for the method's existence.
                 if hasattr(self.research_assistant, "self_consistency_generate"):
                     ctx = build_ctx(query)
                     t0 = time.time()
@@ -270,7 +279,8 @@ class ResearchGPTTester:
                         {"query": query, "response_length": length, "response_time": t_sc, "attempts": 2}
                     )
 
-                # ReAct
+                # ReAct ReAct Workflow test logic is implemented. Added max_steps=4 and search_k=4 parameters for better control, and correctly records the number 
+                # of workflow_steps from the result. Added a check for the method's existence.
                 if hasattr(self.research_assistant, "react_research_workflow"):
                     t0 = time.time()
                     react = self.research_assistant.react_research_workflow(query, max_steps=4, search_k=4)
@@ -288,7 +298,7 @@ class ResearchGPTTester:
             except Exception as e:
                 print(f"   ✗ Error testing query {i+1}: {str(e)}")
 
-        # Persist
+        # Persist Added persistence: self.evaluation_results is updated and the strategy results are saved to prompting_comparison.json.
         self.evaluation_results["prompt_strategy_comparison"] = strategy_results
         (self.tests_dir / "prompting_comparison.json").write_text(
             json.dumps(strategy_results, indent=2, ensure_ascii=False), encoding="utf-8"
@@ -298,7 +308,7 @@ class ResearchGPTTester:
     # ---------------------------
     # Agent Performance Evaluation
     # ---------------------------
-    def test_agent_performance(self):
+    def test_agent_performance(self): # Test performance of various AI agents
         """
         Test each agent:
         1. Summarizer Agent
@@ -311,15 +321,15 @@ class ResearchGPTTester:
         """
         print("\n=== Testing AI Agents ===")
 
-        agent_results: Dict[str, Any] = {
+        agent_results: Dict[str, Any] = { # Initialize agent results
             "summarizer_agent": {},
             "qa_agent": {},
             "workflow_agent": {},
             "orchestrator": {"agents": []},
         }
 
-        # Build doc_ids from meta
-        meta_list = getattr(self.doc_processor, "doc_meta", [])
+        # Build doc_ids from meta if available
+        meta_list = getattr(self.doc_processor, "doc_meta", []) 
         doc_ids = []
         for m in meta_list:
             if isinstance(m, dict):
@@ -327,7 +337,7 @@ class ResearchGPTTester:
         doc_ids = [d for d in {d for d in doc_ids if d}]
 
         try:
-            # Summarizer Agent
+            # Summarizer Agent (test on first doc_id if available)
             print("   Testing Summarizer Agent...")
             if doc_ids:
                 t0 = time.time()
@@ -342,19 +352,19 @@ class ResearchGPTTester:
                 agent_results["summarizer_agent"] = {"ok": False, "reason": "no doc_ids available"}
             print("   ✓ Summarizer Agent test completed")
 
-            # QA Agent
+            # QA Agent (test on fixed question)
             print("   Testing QA Agent...")
             t0 = time.time()
-            qa_result = self.agent_orchestrator.route_task(
+            qa_result = self.agent_orchestrator.route_task( # Test on fixed question
                 "qa", {"question": "What is machine learning?", "type": "factual"}
             )
-            dt = time.time() - t0
+            dt = time.time() - t0 #
             agent_results["qa_agent"] = {"elapsed_sec": dt, "ok": isinstance(qa_result, dict)}
             print("   ✓ QA Agent test completed")
 
             # Workflow Agent
             print("   Testing Research Workflow Agent...")
-            t0 = time.time()
+            t0 = time.time() # Test on fixed research topic
             workflow_result = self.agent_orchestrator.route_task(
                 "workflow", {"research_topic": "artificial intelligence"}
             )
@@ -378,9 +388,9 @@ class ResearchGPTTester:
         return agent_results
 
     # ---------------------------
-    # Response Quality (simple heuristics)
+    # Response Quality 
     # ---------------------------
-    def evaluate_response_quality(self, response: str, query: str):
+    def evaluate_response_quality(self, response: str, query: str): # Basic quality metrics for a response
         """
         Evaluate response quality using simple metrics:
         - length_score: normalized length (0..1)
@@ -419,25 +429,25 @@ class ResearchGPTTester:
         """
         print("\n=== Running Performance Benchmark ===")
 
-        benchmark_results = {
+        benchmark_results = { # Initialize benchmark results
             "document_processing_time_sec": 0.0,
             "query_response_times": [],
             "system_efficiency": {},
         }
 
         # Document processing timing (single ingest + index)
-        t0 = time.time()
-        try:
-            if self.pdfs:
-                p = self.pdfs[0]
-                if _dp_has(self.doc_processor, "add_pdf"):
-                    self.doc_processor.add_pdf(p)
-                elif _dp_has(self.doc_processor, "process_document"):
-                    self.doc_processor.process_document(str(p))
-            if _dp_has(self.doc_processor, "build_search_index"):
-                self.doc_processor.build_search_index()
-        finally:
-            benchmark_results["document_processing_time_sec"] = round(time.time() - t0, 4)
+        t0 = time.time() # Time document processing
+        try: # Test on first PDF if available
+            if self.pdfs: # Check if PDFs are available
+                p = self.pdfs[0] # Use first PDF for timing
+                if _dp_has(self.doc_processor, "add_pdf"): # Prefer add_pdf
+                    self.doc_processor.add_pdf(p) # Add PDF
+                elif _dp_has(self.doc_processor, "process_document"): # Fallback to process_document
+                    self.doc_processor.process_document(str(p)) # Process PDF
+            if _dp_has(self.doc_processor, "build_search_index"): # Build index if possible
+                self.doc_processor.build_search_index() # Build search index
+        finally: # Ensure timing is recorded
+            benchmark_results["document_processing_time_sec"] = round(time.time() - t0, 4)  # Record time taken
 
         # Query response timings (2 queries)
         for query in self.test_queries[:2]:

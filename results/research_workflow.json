@@ -1,0 +1,4 @@
+{
+  "error": "Workflow execution failed: 'ResearchWorkflowAgent' object has no attribute 'conduct_research_session'",
+  "research_topic": "artificial intelligence applications"
+}

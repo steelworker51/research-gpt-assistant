@@ -1,0 +1,23 @@
+{
+  "summarizer_agent": {
+    "doc_id": "C:\\Users\\Windows\\python\\lesson\\ai\\capstone folder for ai\\project_step_by_step\\data\\sample_papers\\2509.19297v1_VolSplat_Rethinking_Feed-Forward_3D_Gaussian_Splatting_with_.pdf",
+    "elapsed_sec": 3.600315809249878,
+    "ok": true
+  },
+  "qa_agent": {
+    "elapsed_sec": 3.206897020339966,
+    "ok": true
+  },
+  "workflow_agent": {
+    "elapsed_sec": 1.9550323486328125e-05,
+    "ok": true,
+    "steps": 0
+  },
+  "orchestrator": {
+    "agents": [
+      "summarizer",
+      "qa",
+      "workflow"
+    ]
+  }
+}

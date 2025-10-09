@@ -1,0 +1,17 @@
+Here’s a structured summary of the academic paper **"LYRA: Generative 3D Scene Reconstruction via Video Diffusion Model Self-Distillation"**:
+
+---
+
+### **1. Research Question/Hypothesis**
+- **Core Question**:
+  Can a **self-distillation framework** leverage **pre-trained video diffusion models** to generate **explicit 3D representations** (3D Gaussian Splatting, 3DGS) from **single images or monocular videos**, eliminating the need for real-world multi-view training data?
+- **Hypothesis**:
+  Video diffusion models implicitly encode 3D knowledge from diverse 2D videos. By distilling this knowledge into a 3DGS decoder (supervised by the video model’s RGB output), Lyra can synthesize **high-fidelity, geometrically consistent 3D/4D scenes** in a feed-forward manner, enabling real-time rendering and dynamic scene generation.
+
+---
+
+### **2. Methodology**
+#### **Key Components**:
+1. **Self-Distillation Framework**:
+   - **Teacher**: Pre-trained **camera-controlled video diffusion model** (e.g., MotionCtrl) that generates RGB video sequences from input (text/image/video + camera trajectories).
+   - **Student**: **3DGS decoder** that

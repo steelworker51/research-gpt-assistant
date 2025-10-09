@@ -1,0 +1,16 @@
+### **Summary of *VolSplat: Rethinking Feed-Forward 3D Gaussian Splatting with Voxel-Aligned Prediction***
+
+#### **1. Research Question / Hypothesis**
+- **Problem**: Existing feed-forward **3D Gaussian Splatting (3DGS)** methods rely on **pixel-aligned Gaussian prediction**, which suffers from:
+  - **View dependency**: Reconstruction quality degrades with fewer input views.
+  - **View-biased density distributions**: Inconsistent Gaussian placement due to occlusion, low texture, or calibration errors.
+  - **Alignment errors**: 2D feature matching fails in complex scenes (e.g., occlusions, motion parallax).
+- **Hypothesis**: A **voxel-aligned** approach—predicting Gaussians directly from a **3D voxel grid**—can overcome these limitations by:
+  - Enabling **multi-view consistency** (robust fusion in 3D space).
+  - Allowing **adaptive density control** based on scene complexity.
+  - Reducing reliance on error-prone 2D-3D unprojection.
+
+---
+
+#### **2. Methodology**
+- **Core Idea**: Replace **pixel-aligned** Gaussian prediction with **voxel-aligned**

@@ -1,0 +1,60 @@
+{
+  "chain_of_thought": [
+    {
+      "query": "What are the main advantages of machine learning?",
+      "response_length": 916,
+      "response_time": 3.628281354904175,
+      "ctx_size": 4
+    },
+    {
+      "query": "How do neural networks process information?",
+      "response_length": 807,
+      "response_time": 2.177105665206909,
+      "ctx_size": 4
+    },
+    {
+      "query": "What are the limitations of current AI systems?",
+      "response_length": 782,
+      "response_time": 3.4263267517089844,
+      "ctx_size": 4
+    }
+  ],
+  "self_consistency": [
+    {
+      "query": "What are the main advantages of machine learning?",
+      "response_length": 694,
+      "response_time": 3.9831886291503906,
+      "attempts": 2
+    },
+    {
+      "query": "How do neural networks process information?",
+      "response_length": 748,
+      "response_time": 4.353320837020874,
+      "attempts": 2
+    },
+    {
+      "query": "What are the limitations of current AI systems?",
+      "response_length": 859,
+      "response_time": 4.06565260887146,
+      "attempts": 2
+    }
+  ],
+  "react_workflow": [
+    {
+      "query": "What are the main advantages of machine learning?",
+      "workflow_steps": 0,
+      "response_time": 5.253324031829834
+    },
+    {
+      "query": "How do neural networks process information?",
+      "workflow_steps": 0,
+      "response_time": 7.770860195159912
+    },
+    {
+      "query": "What are the limitations of current AI systems?",
+      "workflow_steps": 0,
+      "response_time": 7.425469398498535
+    }
+  ],
+  "basic_qa": []
+}

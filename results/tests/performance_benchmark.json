@@ -1,0 +1,20 @@
+{
+  "document_processing_time_sec": 0.7098,
+  "query_response_times": [
+    {
+      "query": "What are the main advantages of machine learning?",
+      "response_time_sec": 1.1905,
+      "response_length": 533
+    },
+    {
+      "query": "How do neural networks process information?",
+      "response_time_sec": 3.4746,
+      "response_length": 821
+    }
+  ],
+  "system_efficiency": {
+    "average_response_time_sec": 2.3325,
+    "stdev_response_time_sec": 1.1421,
+    "queries_per_minute": 25.723
+  }
+}

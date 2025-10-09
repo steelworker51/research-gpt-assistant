@@ -1,0 +1,23 @@
+Here’s a structured summary of the academic paper **"CAR-Flow: Condition-Aware Reparameterization Aligns Source and Target for Better Flow Matching"** with explicit extractions:
+
+---
+
+### **1. Research Question/Hypothesis**
+**Core Problem**:
+Conditional generative models (e.g., diffusion/flow-matching) typically use a **condition-agnostic source distribution** (e.g., standard Gaussian noise), forcing the model to simultaneously:
+1. **Transport probability mass** from the source to the target distribution.
+2. **Inject conditional semantics** (e.g., class labels, text prompts) into the generated samples.
+
+This dual burden **slows convergence, impairs sample quality, and increases training complexity**.
+
+**Hypothesis**:
+By introducing **condition-aware reparameterization (CAR-Flow)**—a lightweight, learned shift to the source, target, or both distributions—the model can:
+- Shorten the "probability path" the velocity network must learn.
+- Improve training efficiency and sample quality with minimal computational overhead.
+
+---
+
+### **2. Methodology**
+#### **Key Innovations**:
+1. **Condition-Aware Reparameterization (CAR-Flow)**:
+   - **Source Distribution Map (`f(·, y)`)**:

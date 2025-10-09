@@ -1,0 +1,14 @@
+{
+  "verdict": "fail",
+  "issues": [
+    "The draft answer makes an unsupported claim about neural networks being 'inspired by biological neural networks.' None of the provided context snippets (S1–S4) contain this information or any definition/description of neural networks."
+  ],
+  "final_answer": "The provided context does not include a definition or description of neural networks. [No supporting citation available in the given snippets.]",
+  "raw": {
+    "verdict": "fail",
+    "issues": [
+      "The draft answer makes an unsupported claim about neural networks being 'inspired by biological neural networks.' None of the provided context snippets (S1–S4) contain this information or any definition/description of neural networks."
+    ],
+    "improved_answer": "The provided context does not include a definition or description of neural networks. [No supporting citation available in the given snippets.]"
+  }
+}

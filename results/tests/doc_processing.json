@@ -1,0 +1,11 @@
+{
+  "pdf_extraction": true,
+  "text_preprocessing": true,
+  "chunking": true,
+  "similarity_search": true,
+  "index_building": true,
+  "errors": [],
+  "docs": 142,
+  "meta": 142,
+  "ingested": 2
+}

@@ -1,0 +1,9 @@
+﻿mistralai>=1.1.0
+PyPDF2
+pandas
+numpy
+scikit-learn
+python-dotenv
+nltk
+arxiv
+arxiv>=2.1.0
